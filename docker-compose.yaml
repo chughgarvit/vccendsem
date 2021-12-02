@@ -1,0 +1,43 @@
+version: '3.7'
+services:
+  influxdb:
+    image: "influxdb:1.8.4-alpine"
+    hostname: "influxdb"
+    container_name: influxdb
+    ports: 
+        - "8086:8086"
+    networks:
+        - mynetwork
+    volumes:
+      - /influxdb:/var/lib/influxdb
+  chronograf:
+    image: "chronograf:latest"
+    hostname: "chronograf"
+    container_name: chronograf
+    ports: 
+        - "8888:8888"
+    networks:
+        - mynetwork
+    volumes:
+      - /Users/garvitchugh/certificates:/certificates
+    environment:
+      - TLS_CERTIFICATE=/certificates/cert.pem
+      - TLS_PRIVATE_KEY=/certificates/key.pem
+  telegraf:
+    image: "telegraf:latest"
+    hostname: "telegraf"
+    container_name: telegraf
+    networks:
+        - mynetwork
+  kapacitor:
+    image: "kapacitor:latest"
+    hostname: "kapacitor"
+    container_name: "kapacitor"
+    environment: 
+        - "KAPACITOR_INFLUXDB_0_URLS_0=http://influxdb:8086"
+    ports:
+        - "9092:9092"
+    networks:
+        - mynetwork
+networks:
+    mynetwork:
